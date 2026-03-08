@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import type { Exercise } from '@/data/curriculum';
-import { CheckCircle2, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface PracticeSectionProps {
   exercises: Exercise[];
@@ -54,7 +53,9 @@ export function PracticeSection({ exercises }: PracticeSectionProps) {
                               </span>
                               <span className="text-gray-700">{option}</span>
                               {isRevealed && isCorrect && (
-                                <CheckCircle2 className="w-5 h-5 text-green-600 ml-auto" />
+                                <svg className="w-5 h-5 text-green-600 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
                               )}
                             </div>
                           </div>
@@ -69,12 +70,16 @@ export function PracticeSection({ exercises }: PracticeSectionProps) {
                   >
                     {revealed === idx ? (
                       <>
-                        <ChevronUp className="w-4 h-4" />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
                         收起解析
                       </>
                     ) : (
                       <>
-                        <ChevronDown className="w-4 h-4" />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
                         查看答案与解析
                       </>
                     )}
@@ -86,7 +91,9 @@ export function PracticeSection({ exercises }: PracticeSectionProps) {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
                     <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
                       <span className="text-sm font-semibold text-green-900">
                         正确答案：{exercise.answer}
                       </span>

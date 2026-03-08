@@ -1,5 +1,7 @@
 import Link from 'next/link';
-import { Metadata, notFound } from 'next';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import type { Lesson } from '@/data/curriculum';
 import {
   stageConfig,
   getStageLessons,
@@ -44,7 +46,7 @@ export default async function StagePage({
     notFound();
   }
 
-  const moduleLessons: Array<{ module: typeof moduleConfig[string]; lessons: typeof getModuleLessons }>[] = [];
+  const moduleLessons: Array<{ module: typeof moduleConfig[string]; lessons: Lesson[] }> = [];
 
   for (const moduleId of stage.modules) {
     const module = moduleConfig[moduleId];

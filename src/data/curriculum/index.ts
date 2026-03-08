@@ -39,10 +39,28 @@ export function getAllLessons(): Record<string, Lesson> {
   Object.assign(lessons, aiEssentialsLessons);
   Object.assign(lessons, apiBasicsLessons);
 
-  // TODO: 添加其他模块
-  // Object.assign(lessons, promptBasicsLessons);
-  // Object.assign(lessons, agentCoreLessons);
-  // ...
+  // Prompt工程模块
+  Object.assign(lessons, promptBasicsLessons);
+  Object.assign(lessons, promptAdvancedLessons);
+
+  // Agent & Tools模块
+  Object.assign(lessons, agentCoreLessons);
+  Object.assign(lessons, mcpProtocolLessons);
+  Object.assign(lessons, workflowDesignLessons);
+
+  // RAG模块
+  Object.assign(lessons, ragArchitectureLessons);
+  Object.assign(lessons, ragOptimizationLessons);
+
+  // Production模块
+  Object.assign(lessons, deploymentLessons);
+  Object.assign(lessons, optimizationLessons);
+  Object.assign(lessons, securityLessons);
+
+  // Frontier模块
+  Object.assign(lessons, multimodalLessons);
+  Object.assign(lessons, swarmLessons);
+  Object.assign(lessons, ethicsLessons);
 
   return lessons;
 }
@@ -128,5 +146,10 @@ import type {
 } from './types';
 
 // 动态导入（避免循环）
-import { aiEssentialsLessons } from './modules/foundation';
+import { aiEssentialsLessons, apiBasicsLessons } from './modules/foundation';
+import { promptBasicsLessons, promptAdvancedLessons } from './modules/prompt';
+import { agentCoreLessons, mcpProtocolLessons, workflowDesignLessons } from './modules/agent';
+import { ragArchitectureLessons, ragOptimizationLessons } from './modules/rag';
+import { deploymentLessons, optimizationLessons, securityLessons } from './modules/production';
+import { multimodalLessons, swarmLessons, ethicsLessons } from './modules/frontier';
 import { stageConfig, moduleConfig } from './types';

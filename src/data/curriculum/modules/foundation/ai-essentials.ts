@@ -1,6 +1,6 @@
 // Foundation - AI 本质与原理 课程数据
 
-import type { Lesson } from '../types';
+import type { Lesson } from '../../types';
 
 export const aiEssentialsLessons: Record<string, Lesson> = {
   'ai-what-is': {
@@ -352,7 +352,7 @@ def estimate_cost(input_tokens: int, output_tokens: int, model: str = "gpt-4") -
 long_text = "这是一段很长的文本..." * 100
 token_count = count_tokens(long_text)
 print(f"Token数量: {token_count}")
-print(f"预估成本: ${estimate_cost(token_count, 500):.4f}")`,
+print(f"预估成本: {estimate_cost(token_count, 500):.4f}")`,
         language: 'python',
       },
     ],

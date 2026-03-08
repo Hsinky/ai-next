@@ -1,6 +1,6 @@
 // Foundation - 参数控制与API调用 课程数据
 
-import type { Lesson } from '../types';
+import type { Lesson } from '../../types';
 
 export const apiBasicsLessons: Record<string, Lesson> = {
   'parameters-explained': {

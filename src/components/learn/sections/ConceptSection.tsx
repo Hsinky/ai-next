@@ -1,14 +1,13 @@
 'use client';
 
 import type { Section as SectionType } from '@/data/curriculum';
-import { CheckCircleIcon } from 'lucide-react';
 
 interface SectionProps {
   section: SectionType;
   index: number;
 }
 
-export function ConceptSection({ section, index, keyPoint }: SectionProps & { keyPoint?: string }) {
+export function ConceptSection({ section, index }: SectionProps) {
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4">
@@ -28,7 +27,9 @@ export function ConceptSection({ section, index, keyPoint }: SectionProps & { ke
         {section.keyPoint && (
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="flex items-start gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <p className="text-sm text-blue-900 font-medium">{section.keyPoint}</p>
             </div>
           </div>

@@ -106,11 +106,11 @@ export default function Header() {
       <div className="flex items-center justify-between px-6 py-3">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
             <span className="text-white text-sm">⚡</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               AI 工具市场
             </span>
           </div>
@@ -188,12 +188,23 @@ export default function Header() {
             <span className="group-hover:scale-110 transition-transform">🎓</span>
           </Link>
 
+          {/* 博客链接 */}
+          <a
+            href="http://hsinky.cn"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-purple-100 flex items-center justify-center text-lg transition-colors group"
+            title="个人博客"
+          >
+            <span className="group-hover:scale-110 transition-transform">📝</span>
+          </a>
+
           {/* 用户区域 - 加载中不显示，避免闪烁 */}
           {!isLoading && (
             user ? (
               <div className="relative group">
                 <button className="flex items-center gap-2 px-2 py-1 rounded-lg transition-all cursor-pointer group/btn">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                     {user.username?.charAt(0).toUpperCase() || "U"}
                   </div>
                   <span className="text-sm font-medium text-gray-700 group-hover/btn:text-gray-900 transition-colors">{user.username}</span>
