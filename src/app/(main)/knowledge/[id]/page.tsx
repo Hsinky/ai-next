@@ -82,18 +82,19 @@ export default async function KnowledgeDetailPage({
       content: (
         <div className="space-y-6">
           <InfoCard title="API 调用示例">
-            <CodeBlock title="bash" code={`# 查询知识库
+            <CodeBlock 
+              title="bash" 
+              code={`# 查询知识库
 curl -X POST "https://api.example.com/knowledge/${knowledge.id}/query" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "query": "如何重置密码？",
-    "top_k": 5,
-    "threshold": 0.7
-  }'} />
+  -d '{"query": "如何重置密码？", "top_k": 5, "threshold": 0.7}'`}
+            />
           </InfoCard>
           <InfoCard title="SDK 使用示例">
-            <CodeBlock title="typescript" code={`import { KnowledgeBase } from '@ai/knowledge-sdk';
+            <CodeBlock 
+              title="typescript" 
+              code={`import { KnowledgeBase } from '@ai/knowledge-sdk';
 
 const kb = new KnowledgeBase({
   id: '${knowledge.id}',
@@ -104,7 +105,8 @@ const kb = new KnowledgeBase({
 const results = await kb.search('如何重置密码', {
   topK: 5,
   threshold: 0.7
-});`} />
+});`}
+            />
           </InfoCard>
         </div>
       ),
