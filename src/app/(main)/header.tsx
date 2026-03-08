@@ -196,7 +196,7 @@ export default function Header() {
             className="w-10 h-10 rounded-full bg-gray-100 hover:bg-purple-100 flex items-center justify-center text-lg transition-colors group"
             title="个人博客"
           >
-            <span className="group-hover:scale-110 transition-transform">📝</span>
+            <span className="group-hover:scale-110 transition-transform">📰</span>
           </a>
 
           {/* 用户区域 - 加载中不显示，避免闪烁 */}

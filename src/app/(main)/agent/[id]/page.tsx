@@ -1,18 +1,6 @@
 import { notFound } from "next/navigation";
-import { getApiUrl } from "@/lib/api-url";
-import { Agent } from "@/types";
+import { getAgent } from "@/lib/data";
 import DetailPageLayout, { CodeBlock, InfoCard } from "@/components/detail/DetailPageLayout";
-
-async function getAgent(id: string): Promise<Agent | null> {
-  try {
-    const res = await fetch(`${await getApiUrl()}/api/agents/${id}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.agent;
-  } catch {
-    return null;
-  }
-}
 
 export default async function AgentDetailPage({
   params,
@@ -20,7 +8,7 @@ export default async function AgentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const agent = await getAgent(id);
+  const agent = getAgent(parseInt(id));
 
   if (!agent) {
     notFound();

@@ -1,132 +1,16 @@
 import Link from "next/link";
-import { getApiUrl } from "@/lib/api-url";
-
-// API 数据类型
-interface Skill {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  version: string;
-  status: string;
-  users: string;
-  rating: number;
-  tags: string[];
-  lastUsed: string;
-  apiCalls: number;
-  difficulty?: 'beginner' | 'intermediate' | 'advanced';
-  scenarios?: string[];
-}
-
-interface MCPServer {
-  id: number;
-  name: string;
-  version: string;
-  status: string;
-  icon: string;
-  category: string;
-  uptime: string;
-  connections: number;
-  lastUpdate: string;
-  latency: string;
-  tags: string[];
-  difficulty?: 'beginner' | 'intermediate' | 'advanced';
-  scenarios?: string[];
-}
-
-interface Agent {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  model: string;
-  status: string;
-  tasks: number;
-  successRate: string;
-  avgTime: string;
-  tags: string[];
-}
-
-interface Prompt {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  uses: number;
-  rating: number;
-  variables: string[];
-  tags: string[];
-}
-
-interface Workflow {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  steps: number;
-  status: string;
-  runs: number;
-  successRate: string;
-  tags: string[];
-}
-
-interface Knowledge {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  documents: number;
-  queries: number;
-  tags: string[];
-}
-
-// 从 API 获取数据
-async function getSkills() {
-  const res = await fetch(`${await getApiUrl()}/api/skills`, { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.skills as Skill[];
-}
-
-async function getMCPServers() {
-  const res = await fetch(`${await getApiUrl()}/api/mcp`, { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.mcpServers as MCPServer[];
-}
-
-async function getAgents() {
-  const res = await fetch(`${await getApiUrl()}/api/agents`, { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.agents as Agent[];
-}
-
-async function getPrompts() {
-  const res = await fetch(`${await getApiUrl()}/api/prompts`, { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.prompts as Prompt[];
-}
-
-async function getWorkflows() {
-  const res = await fetch(`${await getApiUrl()}/api/workflows`, { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.workflows as Workflow[];
-}
-
-async function getKnowledge() {
-  const res = await fetch(`${await getApiUrl()}/api/knowledge`, { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.knowledgeBases as Knowledge[];
-}
+import {
+  getSkills,
+  getMCPServers,
+  getAgents,
+  getPrompts,
+  getWorkflows,
+  type Skill,
+  type MCPServer,
+  type Agent,
+  type Prompt,
+  type Workflow,
+} from "@/lib/data";
 
 // 难度配置
 const difficultyLabels = {
@@ -181,15 +65,13 @@ const abilityInfo = [
   },
 ];
 
-export default async function Home() {
-  const [skills, mcpServers, agents, prompts, workflows, knowledgeBases] = await Promise.all([
-    getSkills(),
-    getMCPServers(),
-    getAgents(),
-    getPrompts(),
-    getWorkflows(),
-    getKnowledge(),
-  ]);
+export default function Home() {
+  // 直接从共享数据层获取数据，无需 HTTP 调用
+  const skills = getSkills();
+  const mcpServers = getMCPServers();
+  const agents = getAgents();
+  const prompts = getPrompts();
+  const workflows = getWorkflows();
 
   return (
     <div className="p-8">
@@ -294,7 +176,7 @@ export default async function Home() {
                 className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all cursor-pointer group block hover:border-blue-200"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 bg-linear-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
                     {skill.icon}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -345,7 +227,7 @@ export default async function Home() {
                 className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all cursor-pointer group block hover:border-blue-200"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 bg-linear-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
                     {server.icon}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -395,7 +277,7 @@ export default async function Home() {
                 className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all cursor-pointer group block hover:border-blue-200"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 bg-linear-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
                     {agent.icon}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -437,7 +319,7 @@ export default async function Home() {
                 className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all cursor-pointer group block hover:border-blue-200"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 bg-linear-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
                     {prompt.icon}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -486,7 +368,7 @@ export default async function Home() {
                 className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all cursor-pointer group block hover:border-blue-200"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 bg-linear-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center text-2xl">
                     {workflow.icon}
                   </div>
                   <div className="flex-1 min-w-0">

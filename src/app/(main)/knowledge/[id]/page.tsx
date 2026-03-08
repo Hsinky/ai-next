@@ -1,18 +1,6 @@
 import { notFound } from "next/navigation";
-import { getApiUrl } from "@/lib/api-url";
-import { KnowledgeBase } from "@/types";
+import { getKnowledgeBase } from "@/lib/data";
 import DetailPageLayout, { CodeBlock, InfoCard } from "@/components/detail/DetailPageLayout";
-
-async function getKnowledgeBase(id: string): Promise<KnowledgeBase | null> {
-  try {
-    const res = await fetch(`${await getApiUrl()}/api/knowledge/${id}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.knowledgeBase;
-  } catch {
-    return null;
-  }
-}
 
 export default async function KnowledgeDetailPage({
   params,
@@ -20,7 +8,7 @@ export default async function KnowledgeDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const knowledge = await getKnowledgeBase(id);
+  const knowledge = getKnowledgeBase(parseInt(id));
 
   if (!knowledge) {
     notFound();
@@ -102,18 +90,7 @@ curl -X POST "https://api.example.com/knowledge/${knowledge.id}/query" \\
     "query": "如何重置密码？",
     "top_k": 5,
     "threshold": 0.7
-  }'
-
-# 响应示例
-{
-  "results": [
-    {
-      "content": "用户可以通过点击登录页面的"忘记密码"链接...",
-      "score": 0.92,
-      "source": "FAQ.md"
-    }
-  ]
-}`} />
+  }'} />
           </InfoCard>
           <InfoCard title="SDK 使用示例">
             <CodeBlock title="typescript" code={`import { KnowledgeBase } from '@ai/knowledge-sdk';
@@ -127,19 +104,7 @@ const kb = new KnowledgeBase({
 const results = await kb.search('如何重置密码', {
   topK: 5,
   threshold: 0.7
-});
-
-// 添加文档
-await kb.addDocument({
-  content: '这是一篇新文档...',
-  metadata: { source: 'manual', category: 'guide' }
-});
-
-// 批量导入
-await kb.import([
-  { content: '文档1内容...', metadata: { source: 'doc1.md' } },
-  { content: '文档2内容...', metadata: { source: 'doc2.md' } },
-]);`} />
+});`} />
           </InfoCard>
         </div>
       ),
@@ -158,11 +123,7 @@ await kb.import([
                 : 'bg-orange-100 text-orange-600'
             }`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {knowledge.accessControl === '公开' ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                )}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <div>

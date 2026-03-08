@@ -1,35 +1,9 @@
-import { getApiUrl } from "@/lib/api-url";
-
-// API 数据类型
-interface Prompt {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  uses: number;
-  rating: number;
-  variables: string[];
-  tags: string[];
-  author: string;
-  updatedAt: string;
-}
-
-// 从 API 获取数据
-async function getPrompts() {
-  const res = await fetch(`${await getApiUrl()}/api/prompts`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch prompts');
-  const data = await res.json();
-  return data.prompts as Prompt[];
-}
-
+import { getPrompts } from "@/lib/data";
 import PromptList from "./components/PromptList";
 import Link from "next/link";
 
-export default async function PromptPage() {
-  const prompts = await getPrompts();
+export default function PromptPage() {
+  const prompts = getPrompts();
 
   return (
     <div className="p-8">

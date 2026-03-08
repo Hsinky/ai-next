@@ -1,36 +1,9 @@
-import { getApiUrl } from "@/lib/api-url";
-
-// API 数据类型
-interface Agent {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  model: string;
-  status: string;
-  tasks: number;
-  successRate: string;
-  avgTime: string;
-  tags: string[];
-  lastRun: string;
-}
-
-// 从 API 获取数据
-async function getAgents() {
-  const res = await fetch(`${await getApiUrl()}/api/agents`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch agents');
-  const data = await res.json();
-  return data.agents as Agent[];
-}
-
+import { getAgents } from "@/lib/data";
 import AgentList from "./components/AgentList";
 import Link from "next/link";
 
-export default async function AgentPage() {
-  const agents = await getAgents();
+export default function AgentPage() {
+  const agents = getAgents();
 
   return (
     <div className="p-8">

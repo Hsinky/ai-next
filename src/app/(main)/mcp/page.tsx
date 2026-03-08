@@ -1,35 +1,9 @@
-import { getApiUrl } from "@/lib/api-url";
-
-// API 数据类型
-interface MCPServer {
-  id: number;
-  name: string;
-  version: string;
-  status: string;
-  icon: string;
-  category: string;
-  uptime: string;
-  connections: number;
-  lastUpdate: string;
-  latency: string;
-  tags: string[];
-}
-
-// 从 API 获取数据
-async function getMCPServers() {
-  const res = await fetch(`${await getApiUrl()}/api/mcp`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch MCP servers');
-  const data = await res.json();
-  return data.mcpServers as MCPServer[];
-}
-
+import { getMCPServers } from "@/lib/data";
 import MCPServerList from "./components/MCPList";
 import Link from "next/link";
 
-export default async function MCPPage() {
-  const mcpServers = await getMCPServers();
+export default function MCPPage() {
+  const mcpServers = getMCPServers();
 
   return (
     <div className="p-8">

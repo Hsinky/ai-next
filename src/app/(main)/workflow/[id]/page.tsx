@@ -1,18 +1,6 @@
 import { notFound } from "next/navigation";
-import { getApiUrl } from "@/lib/api-url";
-import { Workflow } from "@/types";
+import { getWorkflow } from "@/lib/data";
 import DetailPageLayout, { CodeBlock, InfoCard } from "@/components/detail/DetailPageLayout";
-
-async function getWorkflow(id: string): Promise<Workflow | null> {
-  try {
-    const res = await fetch(`${await getApiUrl()}/api/workflows/${id}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.workflow;
-  } catch {
-    return null;
-  }
-}
 
 export default async function WorkflowDetailPage({
   params,
@@ -20,7 +8,7 @@ export default async function WorkflowDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const workflow = await getWorkflow(id);
+  const workflow = getWorkflow(parseInt(id));
 
   if (!workflow) {
     notFound();
@@ -53,18 +41,9 @@ export default async function WorkflowDetailPage({
           <div className="relative">
             {workflow.stepDetails.map((step, index) => (
               <div key={step.id} className="flex items-start mb-8 last:mb-0">
-                {/* 连接线 */}
-                {index < workflow.stepDetails!.length - 1 && (
-                  <div 
-                    className="absolute left-5 top-12 w-0.5 bg-gradient-to-b from-cyan-400 to-cyan-200" 
-                    style={{ height: '48px' }} 
-                  />
-                )}
-                {/* 步骤编号 */}
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 text-white flex items-center justify-center font-bold flex-shrink-0 z-10 shadow-lg">
+                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-cyan-500 to-blue-500 text-white flex items-center justify-center font-bold flex-shrink-0 z-10 shadow-lg">
                   {index + 1}
                 </div>
-                {/* 步骤内容 */}
                 <div className="ml-4 flex-1 bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="font-semibold text-gray-900">{step.name}</h3>

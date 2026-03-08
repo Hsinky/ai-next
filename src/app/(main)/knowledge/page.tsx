@@ -1,35 +1,9 @@
-import { getApiUrl } from "@/lib/api-url";
-
-// API 数据类型
-interface KnowledgeBase {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  documents: number;
-  chunks: number;
-  queries: number;
-  accuracy: string;
-  tags: string[];
-  updatedAt: string;
-}
-
-// 从 API 获取数据
-async function getKnowledgeBases() {
-  const res = await fetch(`${await getApiUrl()}/api/knowledge`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch knowledge bases');
-  const data = await res.json();
-  return data.knowledgeBases as KnowledgeBase[];
-}
-
+import { getKnowledgeBases } from "@/lib/data";
 import KnowledgeList from "./components/KnowledgeList";
 import Link from "next/link";
 
-export default async function KnowledgePage() {
-  const knowledgeBases = await getKnowledgeBases();
+export default function KnowledgePage() {
+  const knowledgeBases = getKnowledgeBases();
 
   return (
     <div className="p-8">

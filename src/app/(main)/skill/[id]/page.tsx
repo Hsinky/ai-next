@@ -1,21 +1,6 @@
 import { notFound } from "next/navigation";
-import { getApiUrl } from "@/lib/api-url";
-import { Skill } from "@/types";
-import DetailPageLayout, { CodeBlock, InfoCard, FeatureList, resourceThemes } from "@/components/detail/DetailPageLayout";
-
-// 获取技能详情
-async function getSkill(id: string): Promise<Skill | null> {
-  try {
-    const res = await fetch(`${await getApiUrl()}/api/skills/${id}`, {
-      cache: 'no-store'
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.skill;
-  } catch {
-    return null;
-  }
-}
+import { getSkill } from "@/lib/data";
+import DetailPageLayout, { CodeBlock, InfoCard, FeatureList } from "@/components/detail/DetailPageLayout";
 
 export default async function SkillDetailPage({
   params,
@@ -23,7 +8,7 @@ export default async function SkillDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const skill = await getSkill(id);
+  const skill = getSkill(parseInt(id));
 
   if (!skill) {
     notFound();

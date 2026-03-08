@@ -1,36 +1,9 @@
-import { getApiUrl } from "@/lib/api-url";
-
-// API 数据类型
-interface Skill {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  version: string;
-  status: string;
-  users: string;
-  rating: number;
-  tags: string[];
-  lastUsed: string;
-  apiCalls: number;
-}
-
-// 从 API 获取数据
-async function getSkills() {
-  const res = await fetch(`${await getApiUrl()}/api/skills`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch skills');
-  const data = await res.json();
-  return data.skills as Skill[];
-}
-
+import { getSkills } from "@/lib/data";
 import SkillList from "./components/SkillList";
 import Link from "next/link";
 
-export default async function SkillPage() {
-  const skills = await getSkills();
+export default function SkillPage() {
+  const skills = getSkills();
 
   return (
     <div className="p-8">

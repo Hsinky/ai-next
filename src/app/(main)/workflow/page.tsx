@@ -1,36 +1,9 @@
-import { getApiUrl } from "@/lib/api-url";
-
-// API 数据类型
-interface Workflow {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  steps: number;
-  status: string;
-  runs: number;
-  successRate: string;
-  avgDuration: string;
-  tags: string[];
-  lastRun: string;
-}
-
-// 从 API 获取数据
-async function getWorkflows() {
-  const res = await fetch(`${await getApiUrl()}/api/workflows`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) throw new Error('Failed to fetch workflows');
-  const data = await res.json();
-  return data.workflows as Workflow[];
-}
-
+import { getWorkflows } from "@/lib/data";
 import WorkflowList from "./components/WorkflowList";
 import Link from "next/link";
 
-export default async function WorkflowPage() {
-  const workflows = await getWorkflows();
+export default function WorkflowPage() {
+  const workflows = getWorkflows();
 
   return (
     <div className="p-8">

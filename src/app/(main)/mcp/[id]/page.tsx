@@ -1,18 +1,6 @@
 import { notFound } from "next/navigation";
-import { getApiUrl } from "@/lib/api-url";
-import { MCPServer } from "@/types";
+import { getMCPServer } from "@/lib/data";
 import DetailPageLayout, { CodeBlock, InfoCard } from "@/components/detail/DetailPageLayout";
-
-async function getMCPServer(id: string): Promise<MCPServer | null> {
-  try {
-    const res = await fetch(`${await getApiUrl()}/api/mcp/${id}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.mcpServer;
-  } catch {
-    return null;
-  }
-}
 
 export default async function MCPDetailPage({
   params,
@@ -20,7 +8,7 @@ export default async function MCPDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const mcp = await getMCPServer(id);
+  const mcp = getMCPServer(parseInt(id));
 
   if (!mcp) {
     notFound();
@@ -94,7 +82,6 @@ export default async function MCPDetailPage({
             <h3 className="text-lg font-semibold text-purple-900 mb-2">什么是 MCP?</h3>
             <p className="text-purple-700">
               MCP (Model Context Protocol) 是一种开放协议，允许 AI 助手安全地连接到外部数据源和工具。
-              通过 MCP，AI 可以访问数据库、文件系统、API 等资源，同时保持安全性和隐私保护。
             </p>
           </div>
           <InfoCard title="安装与配置">

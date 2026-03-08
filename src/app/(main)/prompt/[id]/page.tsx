@@ -1,18 +1,6 @@
 import { notFound } from "next/navigation";
-import { getApiUrl } from "@/lib/api-url";
-import { Prompt } from "@/types";
+import { getPrompt } from "@/lib/data";
 import DetailPageLayout, { CodeBlock, InfoCard } from "@/components/detail/DetailPageLayout";
-
-async function getPrompt(id: string): Promise<Prompt | null> {
-  try {
-    const res = await fetch(`${await getApiUrl()}/api/prompts/${id}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.prompt;
-  } catch {
-    return null;
-  }
-}
 
 export default async function PromptDetailPage({
   params,
@@ -20,7 +8,7 @@ export default async function PromptDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const prompt = await getPrompt(id);
+  const prompt = getPrompt(parseInt(id));
 
   if (!prompt) {
     notFound();
@@ -78,28 +66,6 @@ export default async function PromptDetailPage({
             ))}
           </div>
         </InfoCard>
-      ),
-    },
-    {
-      key: 'examples',
-      label: '使用示例',
-      content: (prompt.exampleInput || prompt.exampleOutput) && (
-        <div className="space-y-6">
-          {prompt.exampleInput && (
-            <InfoCard title="输入示例">
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
-                  {JSON.stringify(prompt.exampleInput, null, 2)}
-                </pre>
-              </div>
-            </InfoCard>
-          )}
-          {prompt.exampleOutput && (
-            <InfoCard title="输出示例">
-              <CodeBlock title="output.txt" code={prompt.exampleOutput} />
-            </InfoCard>
-          )}
-        </div>
       ),
     },
     {
