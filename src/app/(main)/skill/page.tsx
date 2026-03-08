@@ -1,3 +1,5 @@
+import { getApiUrl } from "@/lib/api-url";
+
 // API 数据类型
 interface Skill {
   id: number;
@@ -16,8 +18,7 @@ interface Skill {
 
 // 从 API 获取数据
 async function getSkills() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/skills`, {
+  const res = await fetch(`${await getApiUrl()}/api/skills`, {
     cache: 'no-store'
   });
   if (!res.ok) throw new Error('Failed to fetch skills');

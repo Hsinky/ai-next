@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
+import { getApiUrl } from "@/lib/api-url";
 import { MCPServer } from "@/types";
 import DetailPageLayout, { CodeBlock, InfoCard } from "@/components/detail/DetailPageLayout";
 
 async function getMCPServer(id: string): Promise<MCPServer | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   try {
-    const res = await fetch(`${baseUrl}/api/mcp/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${await getApiUrl()}/api/mcp/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     const data = await res.json();
     return data.mcpServer;

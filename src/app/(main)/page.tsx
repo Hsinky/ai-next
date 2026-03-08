@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getApiUrl } from "@/lib/api-url";
 
 // API 数据类型
 interface Skill {
@@ -86,48 +87,42 @@ interface Knowledge {
 
 // 从 API 获取数据
 async function getSkills() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/skills`, { cache: "no-store" });
+  const res = await fetch(`${await getApiUrl()}/api/skills`, { cache: "no-store" });
   if (!res.ok) return [];
   const data = await res.json();
   return data.skills as Skill[];
 }
 
 async function getMCPServers() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/mcp`, { cache: "no-store" });
+  const res = await fetch(`${await getApiUrl()}/api/mcp`, { cache: "no-store" });
   if (!res.ok) return [];
   const data = await res.json();
   return data.mcpServers as MCPServer[];
 }
 
 async function getAgents() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/agents`, { cache: "no-store" });
+  const res = await fetch(`${await getApiUrl()}/api/agents`, { cache: "no-store" });
   if (!res.ok) return [];
   const data = await res.json();
   return data.agents as Agent[];
 }
 
 async function getPrompts() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/prompts`, { cache: "no-store" });
+  const res = await fetch(`${await getApiUrl()}/api/prompts`, { cache: "no-store" });
   if (!res.ok) return [];
   const data = await res.json();
   return data.prompts as Prompt[];
 }
 
 async function getWorkflows() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/workflows`, { cache: "no-store" });
+  const res = await fetch(`${await getApiUrl()}/api/workflows`, { cache: "no-store" });
   if (!res.ok) return [];
   const data = await res.json();
   return data.workflows as Workflow[];
 }
 
 async function getKnowledge() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/knowledge`, { cache: "no-store" });
+  const res = await fetch(`${await getApiUrl()}/api/knowledge`, { cache: "no-store" });
   if (!res.ok) return [];
   const data = await res.json();
   return data.knowledgeBases as Knowledge[];

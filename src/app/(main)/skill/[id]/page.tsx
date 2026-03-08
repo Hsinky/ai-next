@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
+import { getApiUrl } from "@/lib/api-url";
 import { Skill } from "@/types";
 import DetailPageLayout, { CodeBlock, InfoCard, FeatureList, resourceThemes } from "@/components/detail/DetailPageLayout";
 
 // 获取技能详情
 async function getSkill(id: string): Promise<Skill | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   try {
-    const res = await fetch(`${baseUrl}/api/skills/${id}`, {
+    const res = await fetch(`${await getApiUrl()}/api/skills/${id}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;

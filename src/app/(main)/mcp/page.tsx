@@ -1,3 +1,5 @@
+import { getApiUrl } from "@/lib/api-url";
+
 // API 数据类型
 interface MCPServer {
   id: number;
@@ -15,8 +17,7 @@ interface MCPServer {
 
 // 从 API 获取数据
 async function getMCPServers() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/mcp`, {
+  const res = await fetch(`${await getApiUrl()}/api/mcp`, {
     cache: 'no-store'
   });
   if (!res.ok) throw new Error('Failed to fetch MCP servers');

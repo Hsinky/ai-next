@@ -1,3 +1,5 @@
+import { getApiUrl } from "@/lib/api-url";
+
 // API 数据类型
 interface Prompt {
   id: number;
@@ -15,8 +17,7 @@ interface Prompt {
 
 // 从 API 获取数据
 async function getPrompts() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/prompts`, {
+  const res = await fetch(`${await getApiUrl()}/api/prompts`, {
     cache: 'no-store'
   });
   if (!res.ok) throw new Error('Failed to fetch prompts');

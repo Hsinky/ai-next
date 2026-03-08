@@ -1,3 +1,5 @@
+import { getApiUrl } from "@/lib/api-url";
+
 // API 数据类型
 interface Workflow {
   id: number;
@@ -16,8 +18,7 @@ interface Workflow {
 
 // 从 API 获取数据
 async function getWorkflows() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/workflows`, {
+  const res = await fetch(`${await getApiUrl()}/api/workflows`, {
     cache: 'no-store'
   });
   if (!res.ok) throw new Error('Failed to fetch workflows');
