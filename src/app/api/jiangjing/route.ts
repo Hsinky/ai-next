@@ -12,6 +12,11 @@ function md5(message: string): string {
   return createHash("md5").update(message).digest("hex");
 }
 
+// 缓存 area_guid，避免重复请求
+let cachedAreaGuid: string | null = null;
+let cacheTime: number = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+
 interface CategoryItem {
   PRODCATEGORY: string;
   QUANTITY: string;
@@ -61,32 +66,48 @@ function getTodayDateRange(): string {
 }
 
 async function getAreaGUID(): Promise<string> {
+  // 直接使用 fallback 值，因为 Vercel 无法访问外部 API
+  // 本地开发时可以尝试获取，生产环境直接用 fallback
+  const isVercel = process.env.VERCEL || process.env.VERCEL_ENV;
+  const fallbackGuid = process.env.AREA_GUID || "4fe1414d75434e67bb1a7d188a1ada48";
+
+  if (isVercel) {
+    console.log('[getAreaGUID] Vercel environment detected, using fallback:', fallbackGuid);
+    return fallbackGuid;
+  }
+
+  // 检查缓存
+  const now = Date.now();
+  if (cachedAreaGuid && (now - cacheTime) < CACHE_DURATION) {
+    console.log('[getAreaGUID] Using cached area_guid:', cachedAreaGuid);
+    return cachedAreaGuid;
+  }
+
   try {
     console.log('[getAreaGUID] Fetching area_guid...');
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
 
     const response = await fetch("http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01", {
       signal: controller.signal
     });
     clearTimeout(timeoutId);
 
-    console.log('[getAreaGUID] Response status:', response.status);
     const html = await response.text();
-    console.log('[getAreaGUID] HTML length:', html.length);
-
     const match = html.match(/area_guid = "([^"]+)"/);
     if (match) {
       console.log('[getAreaGUID] Found area_guid:', match[1]);
+      cachedAreaGuid = match[1];
+      cacheTime = now;
       return match[1];
-    } else {
-      console.error('[getAreaGUID] No match found in HTML');
-      return "";
     }
   } catch (error) {
-    console.error('[getAreaGUID] Error:', error);
-    return "";
+    console.log('[getAreaGUID] Fetch failed, using fallback:', fallbackGuid);
   }
+
+  // 默认使用 fallback
+  console.log('[getAreaGUID] Using fallback area_guid:', fallbackGuid);
+  return fallbackGuid;
 }
 
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 25000): Promise<Response> {
