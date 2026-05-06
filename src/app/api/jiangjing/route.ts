@@ -62,11 +62,29 @@ function getTodayDateRange(): string {
 
 async function getAreaGUID(): Promise<string> {
   try {
-    const response = await fetch("http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01");
+    console.log('[getAreaGUID] Fetching area_guid...');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+
+    const response = await fetch("http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01", {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    console.log('[getAreaGUID] Response status:', response.status);
     const html = await response.text();
+    console.log('[getAreaGUID] HTML length:', html.length);
+
     const match = html.match(/area_guid = "([^"]+)"/);
-    return match ? match[1] : "";
-  } catch {
+    if (match) {
+      console.log('[getAreaGUID] Found area_guid:', match[1]);
+      return match[1];
+    } else {
+      console.error('[getAreaGUID] No match found in HTML');
+      return "";
+    }
+  } catch (error) {
+    console.error('[getAreaGUID] Error:', error);
     return "";
   }
 }

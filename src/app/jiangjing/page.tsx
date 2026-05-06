@@ -99,9 +99,20 @@ export default function JiangjingPage() {
   const [data, setData] = useState<CompletionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState(getTodayDate());
-  const [endDate, setEndDate] = useState(getTodayDate());
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // 客户端挂载后初始化日期
+  useEffect(() => {
+    if (!mounted) {
+      const today = getTodayDate();
+      setStartDate(today);
+      setEndDate(today);
+      setMounted(true);
+    }
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
@@ -126,8 +137,10 @@ export default function JiangjingPage() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [startDate, endDate]);
+    if (mounted && startDate && endDate) {
+      fetchData();
+    }
+  }, [startDate, endDate, mounted]);
 
   const handleTodayClick = () => {
     const today = getTodayDate();
