@@ -1,21 +1,12 @@
 import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 
-// 尝试 Node.js runtime（Vercel 可能支持旧 TLS）
 export const runtime = 'nodejs';
-
-// Vercel 函数最大执行时间（秒）
 export const maxDuration = 60;
 
-// 使用 Node.js crypto MD5
 function md5(message: string): string {
   return createHash("md5").update(message).digest("hex");
 }
-
-// 缓存 area_guid，避免重复请求
-let cachedAreaGuid: string | null = null;
-let cacheTime: number = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
 
 interface CategoryItem {
   PRODCATEGORY: string;
@@ -65,154 +56,148 @@ function getTodayDateRange(): string {
   return `${dateStr} ~ ${dateStr}`;
 }
 
-async function getAreaGUID(): Promise<string> {
-  // 直接使用 fallback 值，因为 Vercel 无法访问外部 API
-  // 本地开发时可以尝试获取，生产环境直接用 fallback
-  const isVercel = process.env.VERCEL || process.env.VERCEL_ENV;
-  const fallbackGuid = process.env.AREA_GUID || "4fe1414d75434e67bb1a7d188a1ada48";
+// 转换代理响应格式
+function transformProxyResponse(data: any): NextResponse {
+  // 代理返回的格式: { A007: { d: "..." }, A008: { d: "..." }, ... }
+  // 需要解析 JSON 字符串
+  const parseA007 = typeof data.A007 === 'string' ? JSON.parse(data.A007) : data.A007;
+  const parseA008 = typeof data.A008 === 'string' ? JSON.parse(data.A008) : data.A008;
+  const parseA019 = typeof data.A019 === 'string' ? JSON.parse(data.A019) : data.A019;
+  const parseA016 = typeof data.A016 === 'string' ? JSON.parse(data.A016) : data.A016;
 
-  if (isVercel) {
-    console.log('[getAreaGUID] Vercel environment detected, using fallback:', fallbackGuid);
-    return fallbackGuid;
+  const listA007: DataList = typeof parseA007 === 'string' ? JSON.parse(parseA007) : parseA007;
+  const listA008: DataList = typeof parseA008 === 'string' ? JSON.parse(parseA008) : parseA008;
+  const listA019: DataList = typeof parseA019 === 'string' ? JSON.parse(parseA019) : parseA019;
+  const listA016: DataList = typeof parseA016 === 'string' ? JSON.parse(parseA016) : parseA016;
+
+  const targetAmount = listA007?.A007?.AMOUNT || listA007?.AMOUNT || "0";
+  const posAmount = listA008?.A008?.POS_AMOUNT || listA008?.POS_AMOUNT || "0";
+  const wscAmount = listA008?.A008?.WSC_AMOUNT || listA008?.WSC_AMOUNT || "0";
+
+  const completionRate = calculateCompletionRate(posAmount, wscAmount, targetAmount);
+
+  let categorySales: CategoryItem[] = [];
+  if (listA019?.A019_4 && listA019.A019_4.length > 0) {
+    categorySales = listA019.A019_4;
+  } else if (listA019?.A019?.A019_4 && listA019.A019.A019_4.length > 0) {
+    categorySales = listA019.A019.A019_4;
   }
 
-  // 检查缓存
-  const now = Date.now();
-  if (cachedAreaGuid && (now - cacheTime) < CACHE_DURATION) {
-    console.log('[getAreaGUID] Using cached area_guid:', cachedAreaGuid);
-    return cachedAreaGuid;
+  let seasonSales: SeasonItem[] = [];
+  if (listA019?.A019_2 && listA019.A019_2.length > 0) {
+    seasonSales = listA019.A019_2;
+  } else if (listA019?.A019?.A019_2 && listA019.A019.A019_2.length > 0) {
+    seasonSales = listA019.A019.A019_2;
   }
 
-  try {
-    console.log('[getAreaGUID] Fetching area_guid...');
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
-
-    const response = await fetch("http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01", {
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-
-    const html = await response.text();
-    const match = html.match(/area_guid = "([^"]+)"/);
-    if (match) {
-      console.log('[getAreaGUID] Found area_guid:', match[1]);
-      cachedAreaGuid = match[1];
-      cacheTime = now;
-      return match[1];
+  let esRatio = 0;
+  const a016Data = listA016?.A016 as Array<Record<string, string>> | undefined;
+  if (a016Data && a016Data.length >= 4) {
+    const headerRow = a016Data[0];
+    let targetCol = "T4";
+    for (const [key, value] of Object.entries(headerRow)) {
+      if (value === "S/E") {
+        targetCol = key;
+        break;
+      }
     }
-  } catch (error) {
-    console.log('[getAreaGUID] Fetch failed, using fallback:', fallbackGuid);
+    const compareValue = parseFloat(a016Data[2][targetCol]) || 0;
+    const eValue = parseFloat(a016Data[3][targetCol]) || 0;
+    if (compareValue > 0) {
+      esRatio = (eValue / compareValue) * 100;
+    }
   }
 
-  // 默认使用 fallback
-  console.log('[getAreaGUID] Using fallback area_guid:', fallbackGuid);
-  return fallbackGuid;
-}
-
-async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 25000): Promise<Response> {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    console.log(`[Fetch] Starting request to: ${url}`);
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(id);
-    console.log(`[Fetch] Response status: ${response.status} ${response.statusText}`);
-    return response;
-  } catch (error) {
-    clearTimeout(id);
-    console.error(`[Fetch Error] URL: ${url}`, error);
-    throw error;
-  }
+  return NextResponse.json({
+    success: true,
+    data: {
+      completionRate,
+      targetAmount,
+      totalSales: (parseFloat(posAmount) + parseFloat(wscAmount)).toFixed(1),
+      esRatio: esRatio.toFixed(0),
+      categorySales,
+      seasonSales,
+      fetchedAt: new Date().toISOString(),
+    },
+  });
 }
 
 export async function GET(request: Request) {
   const startTime = Date.now();
+  const url = new URL(request.url);
+  const dateParam = url.searchParams.get("date");
+  const date = dateParam || getTodayDateRange();
+
   console.log('[API] Request started at:', new Date().toISOString());
+  console.log('[API] Date parameter:', date);
 
-  try {
-    const url = new URL(request.url);
-    const dateParam = url.searchParams.get("date");
-    const date = dateParam || getTodayDateRange();
-    console.log('[API] Date parameter:', date);
+  // 检查是否使用代理
+  const proxyUrl = process.env.PROXY_URL;
+  const useProxy = process.env.USE_PROXY === "true" || !!proxyUrl;
 
-    const userno = "1928154";
-    const userdq = "1928154";
-    const usernamedq = "蒋静";
-    const area_guid = await getAreaGUID();
-    if (!area_guid) {
+  if (useProxy && proxyUrl) {
+    try {
+      console.log('[API] Using proxy:', proxyUrl);
+      const response = await fetch(proxyUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date }),
+      });
+      const data = await response.json();
+      return transformProxyResponse(data);
+    } catch (error) {
+      console.error('[API] Proxy error:', error);
       return NextResponse.json(
-        { error: "Failed to get area_guid" },
+        { error: "Proxy request failed", message: error instanceof Error ? error.message : "Unknown error" },
         { status: 500 }
       );
     }
-    const isuser = "0";
-    const sybcode = "FQ01";
+  }
 
-    // 从日期范围中提取单日（用于MD5和API请求body）
-    // 格式: "2026-05-07 ~ 2026-05-07" -> "2026-05-07"
-    const singleDate = date.includes(" ~ ") ? date.split(" ~ ")[0] : date;
+  // 直接调用外部 API（本地开发）
+  const area_guid = process.env.AREA_GUID || "4fe1414d75434e67bb1a7d188a1ada48";
+  const singleDate = date.includes(" ~ ") ? date.split(" ~ ")[0] : date;
+  const cookies = `outusertime=${encodeURIComponent(date)}; outxai=1`;
 
-    // Cookie中使用日期范围格式
-    const cookies = `outusertime=${encodeURIComponent(date)}; outxai=1`;
+  const userno = "1928154";
+  const userdq = "1928154";
+  const usernamedq = "蒋静";
+  const sybcode = "FQ01";
+  const isuser = "0";
 
-    const createMd5 = (type: string) =>
-      md5(userno + userdq + "" + singleDate + type + area_guid + sybcode + isuser);
+  const createMd5 = (type: string) =>
+    md5(userno + userdq + "" + singleDate + type + area_guid + sybcode + isuser);
 
-    const apiUrl = "http://c-cms.eifini.com:9923/index.aspx/GetInfo";
-    console.log('[API] External API URL:', apiUrl);
+  const apiUrl = "http://c-cms.eifini.com:9923/index.aspx/GetInfo";
 
-    // 调试：打印 MD5
-    const md5Str = userno + userdq + "" + singleDate + "A007" + area_guid + sybcode + isuser;
-    console.log('[DEBUG] MD5 input:', md5Str);
-    console.log('[DEBUG] MD5 output:', createMd5("A007"));
-
-    console.log('[API] Starting parallel requests...');
-    const requestTime = Date.now();
-
-    // 计算所有 MD5
+  try {
     const md5A007 = createMd5("A007");
     const md5A008 = createMd5("A008");
     const md5A019 = createMd5("A019");
     const md5A016 = createMd5("A016");
 
     const [responseA007, responseA008, responseA019, responseA016] = await Promise.all([
-      fetchWithTimeout(apiUrl, {
+      fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
         body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date: singleDate, type: "A007", area_guid, sybcode, isuser, md5: md5A007 }),
-      }).catch(e => { console.error('[A007] Failed:', e); throw e; }),
-      fetchWithTimeout(apiUrl, {
+      }),
+      fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
         body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date: singleDate, type: "A008", area_guid, sybcode, isuser, md5: md5A008 }),
-      }).catch(e => { console.error('[A008] Failed:', e); throw e; }),
-      fetchWithTimeout(apiUrl, {
+      }),
+      fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
         body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date: singleDate, type: "A019", area_guid, sybcode, isuser, md5: md5A019 }),
-      }).catch(e => { console.error('[A019] Failed:', e); throw e; }),
-      fetchWithTimeout(apiUrl, {
+      }),
+      fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
         body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date: singleDate, type: "A016", area_guid, sybcode, isuser, md5: md5A016 }),
-      }).catch(e => { console.error('[A016] Failed:', e); throw e; }),
+      }),
     ]);
-
-    console.log(`[API] All requests completed in ${Date.now() - requestTime}ms`);
-
-    if (!responseA007.ok || !responseA008.ok || !responseA019.ok || !responseA016.ok) {
-      console.error('[API] Some responses failed:', {
-        A007: responseA007.status,
-        A008: responseA008.status,
-        A019: responseA019.status,
-        A016: responseA016.status,
-      });
-      return NextResponse.json(
-        { error: "Failed to fetch data from external service", details: { A007: responseA007.status, A008: responseA008.status, A019: responseA019.status, A016: responseA016.status } },
-        { status: 500 }
-      );
-    }
 
     const [dataA007, dataA008, dataA019, dataA016] = await Promise.all([
       responseA007.json(),
@@ -221,87 +206,18 @@ export async function GET(request: Request) {
       responseA016.json(),
     ]);
 
-    console.log('[API] Parsing responses...');
-    console.log('[DEBUG] dataA007.d:', dataA007.d);
-    console.log('[DEBUG] dataA008.d:', dataA008.d);
-
-    const listA007: DataList = JSON.parse(dataA007.d);
-    const listA008: DataList = JSON.parse(dataA008.d);
-    const listA019: DataList = JSON.parse(dataA019.d);
-    const listA016: DataList = JSON.parse(dataA016.d);
-
-    const targetAmount = listA007.A007?.AMOUNT || "0";
-    const posAmount = listA008.A008?.POS_AMOUNT || "0";
-    const wscAmount = listA008.A008?.WSC_AMOUNT || "0";
-
-    const completionRate = calculateCompletionRate(posAmount, wscAmount, targetAmount);
-
-    // 提取 categorySales：先尝试 A019_4，再尝试 A019.A019_4
-    let categorySales: CategoryItem[] = [];
-    if (listA019.A019_4 && listA019.A019_4.length > 0) {
-      categorySales = listA019.A019_4;
-    } else if (listA019.A019?.A019_4 && listA019.A019.A019_4.length > 0) {
-      categorySales = listA019.A019.A019_4;
-    }
-
-    // 提取 seasonSales：先尝试 A019_2，再尝试 A019.A019_2
-    let seasonSales: SeasonItem[] = [];
-    if (listA019.A019_2 && listA019.A019_2.length > 0) {
-      seasonSales = listA019.A019_2;
-    } else if (listA019.A019?.A019_2 && listA019.A019.A019_2.length > 0) {
-      seasonSales = listA019.A019.A019_2;
-    }
-
-    let esRatio = 0;
-    const a016Data = listA016.A016 as Array<Record<string, string>> | undefined;
-
-    if (a016Data && a016Data.length >= 4) {
-      const headerRow = a016Data[0];
-      let targetCol = "T4";
-      for (const [key, value] of Object.entries(headerRow)) {
-        if (value === "S/E") {
-          targetCol = key;
-          break;
-        }
-      }
-      const compareValue = parseFloat(a016Data[2][targetCol]) || 0;
-      const eValue = parseFloat(a016Data[3][targetCol]) || 0;
-      if (compareValue > 0) {
-        esRatio = (eValue / compareValue) * 100;
-      }
-    }
-
-    console.log(`[API] Request completed in ${Date.now() - startTime}ms`);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        completionRate,
-        targetAmount,
-        totalSales: (parseFloat(posAmount) + parseFloat(wscAmount)).toFixed(1),
-        esRatio: esRatio.toFixed(0),
-        categorySales,
-        seasonSales,
-        fetchedAt: new Date().toISOString(),
-      },
-    }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
-      },
+    return transformProxyResponse({
+      A007: dataA007.d,
+      A008: dataA008.d,
+      A019: dataA019.d,
+      A016: dataA016.d,
     });
   } catch (error) {
-    const duration = Date.now() - startTime;
-    console.error(`[API] Error after ${duration}ms:`, error);
-
+    console.error('[API] Error:', error);
     return NextResponse.json(
       {
         error: "Internal server error",
         message: error instanceof Error ? error.message : "Unknown error",
-        debug: {
-          duration: `${duration}ms`,
-          timestamp: new Date().toISOString(),
-          name: error instanceof Error ? error.name : String(error),
-        },
       },
       { status: 500 }
     );
