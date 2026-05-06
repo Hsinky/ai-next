@@ -7,7 +7,10 @@
       "Bash(npx tsc:*)",
       "Bash(awk:*)",
       "Bash(grep -A 30 \"function GetInfo\" /tmp/jiangjing.html | head -50)",
-      "Read(//private/tmp/**)"
+      "Read(//private/tmp/**)",
+      "Bash(git -C /Users/lixinqi/工作/七个格子/ai-next checkout 2fb6747 -- src/app/jiangjing/page.tsx)",
+      "Bash(git -C /Users/lixinqi/工作/七个格子/ai-next checkout HEAD -- next.config.ts)",
+      "Bash(git -C /Users/lixinqi/工作/七个格子/ai-next status --short)"
     ]
   }
 }
