@@ -48,16 +48,6 @@ function formatDate(dateStr: string): string {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 }
 
-// 品类名称映射 - 仅用于报告模板
-const categoryMap: Record<string, string> = {
-  "毛衫": "毛衫",
-  "裤子": "裤子",
-  "上衣": "上衣",
-  "裙子": "裙子",
-  "连衣裙": "连衣裙",
-  "单服装": "单服装",
-};
-
 // 生成报告文本
 function generateReport(data: CompletionData, startDate: string): string {
   const date = formatDate(startDate);

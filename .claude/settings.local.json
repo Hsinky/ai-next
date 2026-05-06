@@ -10,7 +10,33 @@
       "Read(//private/tmp/**)",
       "Bash(git -C /Users/lixinqi/工作/七个格子/ai-next checkout 2fb6747 -- src/app/jiangjing/page.tsx)",
       "Bash(git -C /Users/lixinqi/工作/七个格子/ai-next checkout HEAD -- next.config.ts)",
-      "Bash(git -C /Users/lixinqi/工作/七个格子/ai-next status --short)"
+      "Bash(git -C /Users/lixinqi/工作/七个格子/ai-next status --short)",
+      "Bash(go build *)",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A007\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"560de0416d377eebd57fba4c5938621c\"}')",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A019\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"600ce18c249cc4257a2d8fd17a66fdcd\"}')",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A008\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"6014dabf1f44f0e350f87ac3dd863840\"}')",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A016\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"4e85f141465dfc1c92c16bbb6ca4b4e0\"}')",
+      "Bash(curl -s \"http://localhost:3000/api/jiangjing\")",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A007\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\"}')",
+      "Bash(go run *)",
+      "Bash(curl -s \"http://localhost:8080/api\")",
+      "Bash(pkill -f \"jiangjing\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s \"http://localhost:8080/api?date=2026-05-07%20~%2020-26-05-07\")",
+      "Bash(pkill -f \"jiangjing\" || true *)",
+      "Bash(curl -s \"http://localhost:8080/api?date=2026-05-06%20~%202026-05-06\")",
+      "Bash(curl -s \"http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01\")",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: eid=52846; sybcode=FQ01; outusertime=2026-05-07%20~%202026-05-07; outxai=1' -H 'Referer: http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01' -H 'Origin: http://c-cms.eifini.com:9923' -d '{\"userno\":\"\",\"userdq\":\"\",\"useryz\":\"\",\"usernamedq\":\"\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A007\",\"area_guid\":\"\",\"sybcode\":\"FQ01\",\"isuser\":\"\",\"md5\":\"\"}')",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: eid=52846; sybcode=FQ01; outusertime=2026-05-07%20~%202026-05-07; outxai=1' -H 'Referer: http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A007\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"560de0416d377eebd57fba4c5938621c\"}')",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: eid=52846; sybcode=FQ01; outusertime=2026-05-06%20~%202026-05-06; outxai=1' -H 'Referer: http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-06 ~ 2026-05-06\",\"type\":\"A007\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"0bb93e51f0b4faa50e528256b43d4895\"}')",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -H 'Referer: http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07 ~ 2026-05-07\",\"type\":\"A007\",\"area_guid\":\"9773336a80fa42b8933543bf514c8d82\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"560de0416d377eebd57fba4c5938621c\"}')",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -H 'Referer: http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07\",\"type\":\"A007\",\"area_guid\":\"24757e5d03de405f8fe121c6e7f5d1ed\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"165834e9af8399d68ec4d966a9535fe7\"}')",
+      "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07\",\"type\":\"A007\",\"area_guid\":\"0e588cefb36a4de1a8cd1975433ebaea\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"e81fa15d746e21558f8b1784c4671bb8\"}')",
+      "Bash(curl -s 'http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01')"
+    ],
+    "additionalDirectories": [
+      "/private/tmp"
     ]
   }
 }
