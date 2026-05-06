@@ -5,7 +5,9 @@
       "Bash(grep:*)",
       "Bash(python:*)",
       "Bash(npx tsc:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(grep -A 30 \"function GetInfo\" /tmp/jiangjing.html | head -50)",
+      "Read(//private/tmp/**)"
     ]
   }
 }
