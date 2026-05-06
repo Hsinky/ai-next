@@ -4,6 +4,9 @@ import { createHash } from "crypto";
 // 明确使用 Node.js runtime 以支持 crypto 模块
 export const runtime = 'nodejs';
 
+// Vercel 函数最大执行时间（秒），需要 Pro 版本才能超过 10 秒
+export const maxDuration = 30;
+
 // 纯 JS MD5 实现（用于非 Node.js 环境）
 function jsMd5(message: string): string {
   const s11 = 7, s12 = 12, s13 = 17, s14 = 22;
