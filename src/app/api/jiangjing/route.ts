@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 
+// 明确使用 Node.js runtime 以支持 crypto 模块
+export const runtime = 'nodejs';
+
 // 纯 JS MD5 实现（用于非 Node.js 环境）
 function jsMd5(message: string): string {
   const s11 = 7, s12 = 12, s13 = 17, s14 = 22;
