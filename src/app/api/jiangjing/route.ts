@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
-import * as cheerio from "cheerio";
 import { createHash } from "crypto";
-
-interface GetInfoResponse {
-  d: string;
-}
 
 interface DataList {
   code: number;
@@ -32,12 +27,12 @@ interface DataList {
   }>;
   A016?: Array<{
     T0: string;
-    T1: string;  // 格式: "S/E"
+    T1: string;
   }>;
   other?: number;
 }
 
-// 计算完成率 = (总业绩 / 业绩目标) * 100
+// 计算完成率
 function calculateCompletionRate(
   posAmount: string,
   wscAmount: string,
@@ -45,12 +40,11 @@ function calculateCompletionRate(
 ): string {
   const totalSales = parseFloat(posAmount || "0") + parseFloat(wscAmount || "0");
   const target = parseFloat(targetAmount || "0");
-
   if (target === 0) return "0.0%";
   return ((totalSales / target) * 100).toFixed(1) + "%";
 }
 
-// 获取当天日期范围格式 "2026-05-06 ~ 2026-05-06"
+// 获取当天日期范围
 function getTodayDateRange(): string {
   const today = new Date();
   const year = today.getFullYear();
@@ -60,160 +54,80 @@ function getTodayDateRange(): string {
   return `${dateStr} ~ ${dateStr}`;
 }
 
+// 带超时的 fetch
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 8000): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
 export async function GET(request: Request) {
   try {
-    // 从查询参数获取日期，如果没有则使用当天
     const url = new URL(request.url);
     const dateParam = url.searchParams.get("date");
     const date = dateParam || getTodayDateRange();
 
-    // 先获取页面，提取需要的参数
-    const pageResponse = await fetch(
-      "http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01",
-      { cache: "no-store" }
-    );
-
-    if (!pageResponse.ok) {
-      return NextResponse.json(
-        { error: "Failed to fetch page", status: pageResponse.status },
-        { status: 500 }
-      );
-    }
-
-    const html = await pageResponse.text();
-    const $ = cheerio.load(html);
-
-    // 从页面提取参数
-    const userno = $('script:contains("var userno")').text()?.match(/var userno = "([^"]+)"/)?.[1] || "";
-    const userdq = $('script:contains("var userdq")').text()?.match(/var userdq = "([^"]+)"/)?.[1] || "";
-    const usernamedq = $('script:contains("var usernamedq")').text()?.match(/var usernamedq = "([^"]+)"/)?.[1] || "";
-    const area_guid = $('script:contains("area_guid")').text()?.match(/area_guid = "([^"]+)"/)?.[1] || "";
-    const isuser = $('script:contains("var isuser")').text()?.match(/var isuser ="([^"]+)"/)?.[1] || "0";
-
+    // 硬编码参数（避免每次都抓取页面）
+    const userno = "1928154";
+    const userdq = "1928154";
+    const usernamedq = "蒋静";
+    const area_guid = "9773336a80fa42b8933543bf514c8d82";
+    const isuser = "0";
     const sybcode = "FQ01";
-
-    // 构建 Cookie
     const cookies = `outusertime=${encodeURIComponent(date)}; outxai=1`;
 
-    // 获取 A007 数据（业绩目标）
-    const md5A007 = createHash("md5")
-      .update(userno + userdq + "" + date + "A007" + area_guid + sybcode + isuser)
-      .digest("hex");
+    // 构建 MD5
+    const createMd5 = (type: string) =>
+      createHash("md5").update(userno + userdq + "" + date + type + area_guid + sybcode + isuser).digest("hex");
 
-    const responseA007 = await fetch("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": cookies,
-      },
-      body: JSON.stringify({
-        userno,
-        userdq,
-        useryz: "",
-        usernamedq,
-        channelid: "",
-        date,
-        type: "A007",
-        area_guid,
-        sybcode,
-        isuser,
-        md5: md5A007,
+    // 并行请求所有数据
+    const [responseA007, responseA008, responseA019, responseA016] = await Promise.all([
+      fetchWithTimeout("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
+        body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date, type: "A007", area_guid, sybcode, isuser, md5: createMd5("A007") }),
       }),
-      cache: "no-store",
-    });
-
-    // 获取 A008 数据（总业绩）
-    const md5A008 = createHash("md5")
-      .update(userno + userdq + "" + date + "A008" + area_guid + sybcode + isuser)
-      .digest("hex");
-
-    const responseA008 = await fetch("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": cookies,
-      },
-      body: JSON.stringify({
-        userno,
-        userdq,
-        useryz: "",
-        usernamedq,
-        channelid: "",
-        date,
-        type: "A008",
-        area_guid,
-        sybcode,
-        isuser,
-        md5: md5A008,
+      fetchWithTimeout("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
+        body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date, type: "A008", area_guid, sybcode, isuser, md5: createMd5("A008") }),
       }),
-      cache: "no-store",
-    });
-
-    // 获取 A019 数据（包含品类销售 A019_4、季节销售 A019_2）
-    const md5A019 = createHash("md5")
-      .update(userno + userdq + "" + date + "A019" + area_guid + sybcode + isuser)
-      .digest("hex");
-
-    const responseA019 = await fetch("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": cookies,
-      },
-      body: JSON.stringify({
-        userno,
-        userdq,
-        useryz: "",
-        usernamedq,
-        channelid: "",
-        date,
-        type: "A019",
-        area_guid,
-        sybcode,
-        isuser,
-        md5: md5A019,
+      fetchWithTimeout("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
+        body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date, type: "A019", area_guid, sybcode, isuser, md5: createMd5("A019") }),
       }),
-      cache: "no-store",
-    });
-
-    // 获取 A016 数据（ES 占比）
-    const md5A016 = createHash("md5")
-      .update(userno + userdq + "" + date + "A016" + area_guid + sybcode + isuser)
-      .digest("hex");
-
-    const responseA016 = await fetch("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cookie": cookies,
-      },
-      body: JSON.stringify({
-        userno,
-        userdq,
-        useryz: "",
-        usernamedq,
-        channelid: "",
-        date,
-        type: "A016",
-        area_guid,
-        sybcode,
-        isuser,
-        md5: md5A016,
+      fetchWithTimeout("http://c-cms.eifini.com:9923/index.aspx/GetInfo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
+        body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date, type: "A016", area_guid, sybcode, isuser, md5: createMd5("A016") }),
       }),
-      cache: "no-store",
-    });
+    ]);
 
+    // 检查响应
     if (!responseA007.ok || !responseA008.ok || !responseA019.ok || !responseA016.ok) {
       return NextResponse.json(
-        { error: "Failed to fetch data from API" },
+        { error: "Failed to fetch data from external service" },
         { status: 500 }
       );
     }
 
-    const dataA007: GetInfoResponse = await responseA007.json();
-    const dataA008: GetInfoResponse = await responseA008.json();
-    const dataA019: GetInfoResponse = await responseA019.json();
-    const dataA016: GetInfoResponse = await responseA016.json();
+    const [dataA007, dataA008, dataA019, dataA016] = await Promise.all([
+      responseA007.json(),
+      responseA008.json(),
+      responseA019.json(),
+      responseA016.json(),
+    ]);
 
     const listA007: DataList = JSON.parse(dataA007.d);
     const listA008: DataList = JSON.parse(dataA008.d);
@@ -231,18 +145,13 @@ export async function GET(request: Request) {
     // 季节销售数据
     const seasonSales = listA019.A019_2 || [];
 
-    // 计算 ES 占比（E店均业绩 / 对比店均业绩）
-    // A016 数据结构：
-    // 第1行: 表头 "T0":"同商场品牌", "T1":"PM/E", "T2":"MM/E", "T3":"AM/E", "T4":"S/E"
-    // 第3行: 对比店均业绩
-    // 第4行: E店均业绩
+    // 计算 ES 占比
     let esRatio = 0;
     const a016Data = listA016.A016 as Array<Record<string, string>> | undefined;
 
     if (a016Data && a016Data.length >= 4) {
-      // 找到表头中 "S/E" 所在的列索引
       const headerRow = a016Data[0];
-      let targetCol = "T4"; // 默认是 T4 (S/E)
+      let targetCol = "T4";
 
       for (const [key, value] of Object.entries(headerRow)) {
         if (value === "S/E") {
@@ -251,7 +160,6 @@ export async function GET(request: Request) {
         }
       }
 
-      // 第3行（索引2）是对比店均业绩，第4行（索引3）是 E 店均业绩
       const compareValue = parseFloat(a016Data[2][targetCol]) || 0;
       const eValue = parseFloat(a016Data[3][targetCol]) || 0;
 
@@ -271,8 +179,13 @@ export async function GET(request: Request) {
         seasonSales,
         fetchedAt: new Date().toISOString(),
       },
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+      },
     });
   } catch (error) {
+    console.error('API Error:', error);
     return NextResponse.json(
       {
         error: "Internal server error",
