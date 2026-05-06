@@ -19,7 +19,7 @@ interface SeasonItem {
 }
 
 // 直接使用原始季节数据，不做累加
-function useRawSeasonData(seasonSales: SeasonItem[]): SeasonItem[] {
+function filterRawSeasonData(seasonSales: SeasonItem[]): SeasonItem[] {
   return seasonSales.filter((s) => s && s.QUARTER);
 }
 
@@ -65,7 +65,7 @@ function generateReport(data: CompletionData, startDate: string): string {
     .join("\n");
 
   // 季节销售行 - 直接使用原始数据
-  const rawSeasons = useRawSeasonData(data.seasonSales);
+  const rawSeasons = filterRawSeasonData(data.seasonSales);
   const seasonLines = rawSeasons
     .map((s) => {
       const name = s.QUARTER.replace("装", "");
@@ -292,7 +292,7 @@ export default function JiangjingPage() {
               <div className="bg-white rounded-xl shadow-sm p-4">
                 <div className="text-sm font-medium text-gray-700 mb-3">季节占比</div>
                 <div className="grid grid-cols-3 gap-2">
-                  {useRawSeasonData(data.seasonSales).map((item, index) => (
+                  {filterRawSeasonData(data.seasonSales).map((item, index) => (
                     <div key={index} className="text-center p-2 bg-gray-50 rounded-lg">
                       <div className="text-xs text-gray-500">{item.QUARTER}</div>
                       <div className="text-lg font-bold text-gray-900">{item.SYEZB}%</div>
