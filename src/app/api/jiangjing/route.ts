@@ -38,6 +38,10 @@ interface DataList {
   A019_2?: SeasonItem[];
   A016?: Array<Record<string, string>>;
   other?: number;
+  // 备用字段：某些响应直接返回这些字段
+  AMOUNT?: string;
+  POS_AMOUNT?: string;
+  WSC_AMOUNT?: string;
 }
 
 function calculateCompletionRate(posAmount: string, wscAmount: string, targetAmount: string): string {
@@ -54,6 +58,21 @@ function getTodayDateRange(): string {
   const day = String(today.getDate()).padStart(2, "0");
   const dateStr = `${year}-${month}-${day}`;
   return `${dateStr} ~ ${dateStr}`;
+}
+
+// 动态获取 area_guid
+async function getAreaGUID(): Promise<string> {
+  try {
+    const response = await fetch("http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01");
+    const body = await response.text();
+    const match = body.match(/area_guid\s*=\s*"([^"]+)"/);
+    if (match && match[1]) {
+      return match[1];
+    }
+  } catch (error) {
+    console.error('[API] Failed to fetch area_guid:', error);
+  }
+  return process.env.AREA_GUID || "4fe1414d75434e67bb1a7d188a1ada48";
 }
 
 // 转换代理响应格式
@@ -155,7 +174,7 @@ export async function GET(request: Request) {
   }
 
   // 直接调用外部 API（本地开发）
-  const area_guid = process.env.AREA_GUID || "4fe1414d75434e67bb1a7d188a1ada48";
+  const area_guid = await getAreaGUID();
   const singleDate = date.includes(" ~ ") ? date.split(" ~ ")[0] : date;
   const cookies = `outusertime=${encodeURIComponent(date)}; outxai=1`;
 
