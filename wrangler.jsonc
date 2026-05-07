@@ -3,5 +3,9 @@
   "name": "ai-next",
   "compatibility_date": "2026-05-07",
   "compatibility_flags": ["nodejs_compat"],
-  "observability": { "enabled": true }
+  "main": ".open-next/worker.js",
+  "observability": { "enabled": true },
+  "build": {
+    "command": "npx @opennextjs/cloudflare build"
+  }
 }
