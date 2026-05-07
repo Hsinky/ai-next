@@ -9,5 +9,9 @@
       "binding": "WORKER_SELF_REFERENCE",
       "service": "ai-next"
     }
-  ]
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  }
 }
