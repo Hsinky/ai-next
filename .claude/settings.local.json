@@ -33,7 +33,12 @@
       "Bash(pkill -f \"next dev\")",
       "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -H 'Referer: http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07\",\"type\":\"A007\",\"area_guid\":\"24757e5d03de405f8fe121c6e7f5d1ed\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"165834e9af8399d68ec4d966a9535fe7\"}')",
       "Bash(curl -s -X POST http://c-cms.eifini.com:9923/index.aspx/GetInfo -H 'Content-Type: application/json; charset=utf-8' -H 'Cookie: outusertime=2026-05-07%20~%202026-05-07; outxai=1' -d '{\"userno\":\"1928154\",\"userdq\":\"1928154\",\"useryz\":\"\",\"usernamedq\":\"蒋静\",\"channelid\":\"\",\"date\":\"2026-05-07\",\"type\":\"A007\",\"area_guid\":\"0e588cefb36a4de1a8cd1975433ebaea\",\"sybcode\":\"FQ01\",\"isuser\":\"0\",\"md5\":\"e81fa15d746e21558f8b1784c4671bb8\"}')",
-      "Bash(curl -s 'http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01')"
+      "Bash(curl -s 'http://c-cms.eifini.com:9923/index.aspx?eid=52846&sybcode=FQ01')",
+      "Bash(go version *)",
+      "Bash(xxd)",
+      "Bash(python3)",
+      "Bash(curl -s 'http://localhost:8080/api?date=2026-05-09%20~%202026-05-09')",
+      "Bash(python3 -c ' *)"
     ],
     "additionalDirectories": [
       "/private/tmp"
