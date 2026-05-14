@@ -233,23 +233,23 @@ export default function JiangjingPage() {
         {/* 日期选择器 */}
         <div className="bg-white rounded-xl shadow-sm p-3">
           <div className="text-sm text-gray-500 mb-2">选择日期范围</div>
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <div className="min-w-0">
+          <div className="space-y-2 mb-3">
+            <div>
               <label className="text-xs text-gray-600 block mb-1">开始日期</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm box-border"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm box-border"
               />
             </div>
-            <div className="min-w-0">
+            <div>
               <label className="text-xs text-gray-600 block mb-1">结束日期</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm box-border"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm box-border"
               />
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function JiangjingPage() {
               {loading ? "查询中..." : "查询"}
             </button>
           </div>
-          <div className="mt-3 text-xs text-gray-500 text-center">
+          <div className="mt-2 text-xs text-gray-500 text-center">
             已选: {startDate} ~ {endDate}
           </div>
         </div>
