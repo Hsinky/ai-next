@@ -229,27 +229,27 @@ export default function JiangjingPage() {
       </div>
 
       {/* 内容区域 */}
-      <div className="p-4 space-y-4 max-w-lg mx-auto">
+      <div className="p-3 space-y-3 w-full box-border">
         {/* 日期选择器 */}
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="text-sm text-gray-500 mb-3">选择日期范围</div>
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div>
+        <div className="bg-white rounded-xl shadow-sm p-3">
+          <div className="text-sm text-gray-500 mb-2">选择日期范围</div>
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="min-w-0">
               <label className="text-xs text-gray-600 block mb-1">开始日期</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm box-border"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="text-xs text-gray-600 block mb-1">结束日期</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                className="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm box-border"
               />
             </div>
           </div>
