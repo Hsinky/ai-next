@@ -3,7 +3,7 @@ name: 网页爬虫定时推送
 on:
   schedule:
     # 每天北京时间 09:00 执行（UTC减8小时）
-    - cron: '0 1 * * *'
+    - cron: '0 15 * * *'  # ← 每天北京时间 23:00 执行
   # 允许手动触发测试
   workflow_dispatch:
 
