@@ -24,6 +24,14 @@ interface SeasonItem {
   ZKL: string;
 }
 
+interface StoreItem {
+  NAME: string;
+  PLAN_AMOUNT: string;
+  POS_AMOUNT: string;
+  WSC_AMOUNT: string;
+  WCL: string;
+}
+
 interface A019Data {
   A019_4?: CategoryItem[];
   A019_2?: SeasonItem[];
@@ -127,6 +135,34 @@ function transformProxyResponse(data: any): NextResponse {
     }
   }
 
+  // 解析 A024 店铺排名
+  const parseA024 = typeof data.A024 === 'string' ? JSON.parse(data.A024) : data.A024;
+  let storeList: StoreItem[] = [];
+  if (parseA024) {
+    const parsed = typeof parseA024 === 'string' ? JSON.parse(parseA024) : parseA024;
+    storeList = parsed?.A024 || [];
+  }
+
+  // 按完成率分组店铺
+  const passedStores: string[] = [];
+  const failedStores: string[] = [];
+  for (const s of storeList) {
+    if (s.NAME.includes("特卖")) continue;
+    const wcl = parseFloat(s.WCL) || 0;
+    if (wcl >= 100) {
+      passedStores.push(s.NAME);
+    } else {
+      failedStores.push(s.NAME);
+    }
+  }
+
+  const cleanName = (name: string) =>
+    name.replace(/四川成都/g, "").replace(/购物广场/g, "").replace(/广场/g, "");
+
+  const passedClean = passedStores.map(cleanName);
+  const failedClean = failedStores.map(cleanName);
+  const storeAnalysis = passedClean.join("/") + "✅\n" + failedClean.join("/") + "❌";
+
   return NextResponse.json({
     success: true,
     data: {
@@ -137,6 +173,7 @@ function transformProxyResponse(data: any): NextResponse {
       categorySales,
       seasonSales,
       fetchedAt: new Date().toISOString(),
+      storeAnalysis,
     },
   });
 }
@@ -194,8 +231,9 @@ export async function GET(request: Request) {
     const md5A008 = createMd5("A008");
     const md5A019 = createMd5("A019");
     const md5A016 = createMd5("A016");
+    const md5A024 = createMd5("A024");
 
-    const [responseA007, responseA008, responseA019, responseA016] = await Promise.all([
+    const [responseA007, responseA008, responseA019, responseA016, responseA024] = await Promise.all([
       fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
@@ -216,13 +254,19 @@ export async function GET(request: Request) {
         headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
         body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date: singleDate, type: "A016", area_guid, sybcode, isuser, md5: md5A016 }),
       }),
+      fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cookie": cookies },
+        body: JSON.stringify({ userno, userdq, useryz: "", usernamedq, channelid: "", date: singleDate, type: "A024", area_guid, sybcode, isuser, md5: md5A024 }),
+      }),
     ]);
 
-    const [dataA007, dataA008, dataA019, dataA016] = await Promise.all([
+    const [dataA007, dataA008, dataA019, dataA016, dataA024] = await Promise.all([
       responseA007.json(),
       responseA008.json(),
       responseA019.json(),
       responseA016.json(),
+      responseA024.json(),
     ]);
 
     return transformProxyResponse({
@@ -230,6 +274,7 @@ export async function GET(request: Request) {
       A008: dataA008.d,
       A019: dataA019.d,
       A016: dataA016.d,
+      A024: dataA024.d,
     });
   } catch (error) {
     console.error('[API] Error:', error);

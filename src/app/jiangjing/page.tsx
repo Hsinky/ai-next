@@ -31,6 +31,7 @@ interface CompletionData {
   categorySales: CategoryItem[];
   seasonSales: SeasonItem[];
   fetchedAt: string;
+  storeAnalysis: string;
 }
 
 // 获取当天日期 YYYY-MM-DD
@@ -92,26 +93,46 @@ ES占比：${esRatio}%
 ${seasonLines || "春装占比_%，\n夏装占比_%\n常青款占比_%"}
 
 品类销售占比：
-${categoryLines || "毛衫_件  占比_%\n裤子_件  占比_%\n上衣_件  占比_%\n裙子_件  占比_%\n连衣裙_件 占比_%\n单服装_件，占比_%"}`;
+${categoryLines || "毛衫_件  占比_%\n裤子_件  占比_%\n上衣_件  占比_%\n裙子_件  占比_%\n连衣裙_件 占比_%\n单服装_件，占比_%"}
+
+会员回店数：8人/金额18643
+
+1.区域完成${data.completionRate}
+${data.storeAnalysis || ""}
+2.今日会员回店8人，占比36%，客单2330，3000+产出3张，大悦城回头不理想
+3.主推达成，卓锦/和悦有提升，头部深度不够
+明日重点
+1.区域五一销售复盘，周目标同频
+2.跟进区域4个重点款式产出，新同事练货跟进
+3.生日及临期券顾客邀约跟进，持续跟进大V资料完善，及店铺学习情况`;
 }
 
 export default function JiangjingPage() {
   const [data, setData] = useState<CompletionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(() => getTodayDate());
+  const [endDate, setEndDate] = useState(() => getTodayDate());
   const [copied, setCopied] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  // 客户端挂载后初始化日期
+  // 初始加载
   useEffect(() => {
-    if (!mounted) {
-      const today = getTodayDate();
-      setStartDate(today);
-      setEndDate(today);
-      setMounted(true);
-    }
+    const today = getTodayDate();
+    const dateRange = `${today} ~ ${today}`;
+    fetch(`/api/jiangjing?date=${encodeURIComponent(dateRange)}`, { cache: "no-store" })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.success) {
+          setData(result.data);
+        } else {
+          setError(result.error || "获取数据失败");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : "网络错误");
+        setLoading(false);
+      });
   }, []);
 
   const fetchData = async () => {
@@ -135,13 +156,6 @@ export default function JiangjingPage() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    // 初始加载时查询当天数据
-    if (mounted && startDate && endDate && !data) {
-      fetchData();
-    }
-  }, [mounted]);
 
   const handleTodayClick = async () => {
     const today = getTodayDate();
@@ -216,6 +230,7 @@ export default function JiangjingPage() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
+                suppressHydrationWarning
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
             </div>
@@ -225,6 +240,7 @@ export default function JiangjingPage() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                suppressHydrationWarning
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
             </div>
