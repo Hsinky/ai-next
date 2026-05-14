@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+console.log("[jiangjing] 1. MODULE LOADED");
+
 interface CategoryItem {
   PRODCATEGORY: string;
   QUANTITY: string;
@@ -108,6 +110,7 @@ ${data.storeAnalysis || ""}
 }
 
 export default function JiangjingPage() {
+  console.log("[jiangjing] 2. COMPONENT RENDER");
   const [data, setData] = useState<CompletionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -117,6 +120,7 @@ export default function JiangjingPage() {
 
   // 初始加载
   useEffect(() => {
+    console.log("[jiangjing] 3. EFFECT RUN");
     const today = getTodayDate();
     const dateRange = `${today} ~ ${today}`;
     console.log("[jiangjing] start fetch:", dateRange);
