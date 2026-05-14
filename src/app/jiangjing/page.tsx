@@ -119,9 +119,14 @@ export default function JiangjingPage() {
   useEffect(() => {
     const today = getTodayDate();
     const dateRange = `${today} ~ ${today}`;
+    console.log("[jiangjing] start fetch:", dateRange);
     fetch(`/api/jiangjing?date=${encodeURIComponent(dateRange)}`, { cache: "no-store" })
-      .then((res) => res.json())
+      .then((res) => {
+        console.log("[jiangjing] response status:", res.status);
+        return res.json();
+      })
       .then((result) => {
+        console.log("[jiangjing] result:", result.success, result.error || "ok");
         if (result.success) {
           setData(result.data);
         } else {
@@ -130,6 +135,7 @@ export default function JiangjingPage() {
         setLoading(false);
       })
       .catch((err) => {
+        console.error("[jiangjing] fetch error:", err);
         setError(err instanceof Error ? err.message : "网络错误");
         setLoading(false);
       });
