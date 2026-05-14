@@ -1,0 +1,28 @@
+name: 网页爬虫定时推送
+
+on:
+  schedule:
+    # 每天北京时间 09:00 执行（UTC减8小时）
+    - cron: '0 1 * * *'
+  # 允许手动触发测试
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install requests beautifulsoup4
+
+      - name: 运行爬虫并推送
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+        run: python spider.py
